@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Delete } from '@nestjs/common';
 import { Contact } from './entities/contact.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -32,7 +32,7 @@ export class ContactsService {
       where: { id: contactId },
     });
     if (!contact) {
-      throw new NotFoundException('tournament not found');
+      throw new NotFoundException('contact not found');
     }
     return contact;
   }
@@ -44,5 +44,10 @@ export class ContactsService {
     const contactUpdate = await this.verifyContact(contactId);
     Object.assign(contactUpdate, updateContactDto);
     return await this.contactRepository.save(contactUpdate);
+  }
+
+  async deleteContact(contactId: string): Promise<Contact> {
+    const contact = await this.verifyContact(contactId);
+    return await this.contactRepository.remove(contact);
   }
 }
