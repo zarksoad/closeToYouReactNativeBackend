@@ -50,4 +50,8 @@ export class ContactsService {
     const contact = await this.verifyContact(contactId);
     return await this.contactRepository.remove(contact);
   }
+
+  async findAllContacts(): Promise<Contact[]> {
+    return await this.contactRepository.find();
+  }
 }
