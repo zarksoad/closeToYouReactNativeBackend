@@ -1,26 +1,48 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Contact } from './entities/contact.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from 'src/auth/entities/auth.entity';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 
 @Injectable()
 export class ContactsService {
-  create(createContactDto: CreateContactDto) {
-    return 'This action adds a new contact';
+  constructor(
+    @InjectRepository(Contact)
+    private readonly contactRepository: Repository<Contact>,
+  ) {}
+  async checkContact(email: string): Promise<string> {
+    const user = await this.contactRepository.findOne({ where: { email } });
+    if (user) {
+      throw new NotFoundException('The email has already been used');
+    }
+    return email;
   }
 
-  findAll() {
-    return `This action returns all contacts`;
+  async createContact(createUserDTO: CreateContactDto): Promise<Contact> {
+    await this.checkContact(createUserDTO.email);
+    const contact = await this.contactRepository.create(createUserDTO);
+    const newContact = await this.contactRepository.save(contact);
+    return newContact;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} contact`;
+  async verifyContact(contactId: string): Promise<Contact> {
+    const contact = await this.contactRepository.findOne({
+      where: { id: contactId },
+    });
+    if (!contact) {
+      throw new NotFoundException('tournament not found');
+    }
+    return contact;
   }
 
-  update(id: number, updateContactDto: UpdateContactDto) {
-    return `This action updates a #${id} contact`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} contact`;
+  async updateContact(
+    contactId: string,
+    updateContactDto: UpdateContactDto,
+  ): Promise<Contact> {
+    const contactUpdate = await this.verifyContact(contactId);
+    Object.assign(contactUpdate, updateContactDto);
+    return await this.contactRepository.save(contactUpdate);
   }
 }

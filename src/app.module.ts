@@ -5,6 +5,8 @@ import { APP_FILTER } from '@nestjs/core';
 import { Contact } from './contacts/entities/contact.entity';
 import { ContactsModule } from './contacts/contacts.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { AuthModule } from './auth/auth.module';
+import { User } from './auth/entities/auth.entity';
 
 @Module({
   imports: [
@@ -30,13 +32,15 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
           username: configService.get<string>('DATABASE_USERNAME'),
           password: configService.get<string>('DATABASE_PASSWORD'),
           database: configService.get<string>('DATABASE_NAME'),
-          entities: [Contact],
+          entities: [Contact, User],
           synchronize: true,
+          logging: true,
         };
       },
     }),
 
     ContactsModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [
