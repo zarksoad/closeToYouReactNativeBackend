@@ -18,17 +18,11 @@ import { User } from './auth/entities/auth.entity';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
-        ({
-          type: configService.get<'mysql'>('DB_TYPE'),
-          host: configService.get<string>('DATABASE_HOST'),
-          username: configService.get<string>('DATABASE_USERNAME'),
-          password: configService.get<string>('DATABASE_PASSWORD'),
-          database: configService.get<string>('DATABASE_NAME'),
-        });
-
         return {
-          type: configService.get<'mysql'>('DB_TYPE'),
+          type: 'mysql',
           host: configService.get<string>('DATABASE_HOST'),
+          port:
+            parseInt(configService.get<string>('DATABASE_PORT'), 10) || 14146, // Ensure port is parsed as number
           username: configService.get<string>('DATABASE_USERNAME'),
           password: configService.get<string>('DATABASE_PASSWORD'),
           database: configService.get<string>('DATABASE_NAME'),
@@ -38,7 +32,6 @@ import { User } from './auth/entities/auth.entity';
         };
       },
     }),
-
     ContactsModule,
     AuthModule,
   ],
