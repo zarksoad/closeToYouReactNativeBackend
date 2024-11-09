@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { User } from 'src/auth/entities/auth.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity('contacts')
 export class Contact {
@@ -14,12 +21,19 @@ export class Contact {
   @Column()
   email: string;
 
-  @Column()
+  @Column({ nullable: true })
   imageUri: string;
 
-  @Column('decimal', { precision: 10, scale: 8 })
+  @Column('decimal', { precision: 10, scale: 8, nullable: true })
   latitude: number;
 
-  @Column('decimal', { precision: 11, scale: 8 })
+  @Column('decimal', { precision: 11, scale: 8, nullable: true })
   longitude: number;
+
+  @ManyToOne(() => User, (user) => user.contacts)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column()
+  userId: string;
 }

@@ -2,7 +2,6 @@ import { Injectable, NotFoundException, Delete } from '@nestjs/common';
 import { Contact } from './entities/contact.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from 'src/auth/entities/auth.entity';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 
@@ -20,9 +19,15 @@ export class ContactsService {
     return email;
   }
 
-  async createContact(createUserDTO: CreateContactDto): Promise<Contact> {
+  async createContact(
+    userId: string,
+    createUserDTO: CreateContactDto,
+  ): Promise<Contact> {
     await this.checkContact(createUserDTO.email);
-    const contact = await this.contactRepository.create(createUserDTO);
+    const contact = await this.contactRepository.create({
+      ...createUserDTO,
+      userId,
+    });
     const newContact = await this.contactRepository.save(contact);
     return newContact;
   }
@@ -42,6 +47,9 @@ export class ContactsService {
     updateContactDto: UpdateContactDto,
   ): Promise<Contact> {
     const contactUpdate = await this.verifyContact(contactId);
+    console.log('**************************');
+    console.log('this is the contact', contactUpdate);
+    console.log('**************************');
     Object.assign(contactUpdate, updateContactDto);
     return await this.contactRepository.save(contactUpdate);
   }

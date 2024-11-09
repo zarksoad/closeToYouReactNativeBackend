@@ -1,10 +1,16 @@
-import { IsString, IsEmail, IsPhoneNumber, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsNumber,
+  IsNotEmpty,
+  IsEmpty,
+} from 'class-validator';
 
 export class CreateContactDto {
   @IsString()
   name: string;
 
-  @IsPhoneNumber()
+  @IsString()
   phone: string;
 
   @IsEmail()
@@ -14,8 +20,13 @@ export class CreateContactDto {
   imageUri: string;
 
   @IsNumber()
+  @IsEmpty()
   latitude: number;
 
   @IsNumber()
   longitude: number;
+
+  @IsNotEmpty()
+  @IsString()
+  userId: string;
 }

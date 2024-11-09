@@ -15,8 +15,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any) {
     if (!payload) {
+      console.log('Invalid token - no payload found');
       throw new UnauthorizedException('Invalid token');
     }
-    return { userId: payload.userId, roleId: payload.roleId };
+
+    // Check if the token has expired
+    const now = Math.floor(Date.now() / 1000); // Current time in seconds
+    if (payload.exp < now) {
+      console.log(`Token has expired: ${payload.exp}`);
+      throw new UnauthorizedException('Token has expired');
+    }
+
+    console.log(`Token validated successfully for user: ${payload.userId}`);
+
+    return { userId: payload.userId };
   }
 }
