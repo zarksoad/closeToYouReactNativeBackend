@@ -40,8 +40,8 @@ export class ContactsController {
     return this.contactsService.deleteContact(contactId);
   }
   @Get()
-  findAll() {
-    return this.contactsService.findAllContacts();
+  findAll(@UserId() userId: string) {
+    return this.contactsService.findAllContacts(userId);
   }
 
   @Get(':id')

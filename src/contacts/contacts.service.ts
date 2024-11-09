@@ -59,7 +59,7 @@ export class ContactsService {
     return await this.contactRepository.remove(contact);
   }
 
-  async findAllContacts(): Promise<Contact[]> {
-    return await this.contactRepository.find();
+  async findAllContacts(userId: string): Promise<Contact[]> {
+    return await this.contactRepository.find({ where: { userId: userId } });
   }
 }
