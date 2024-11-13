@@ -28,6 +28,15 @@ export class ContactsController {
     return this.contactsService.createContact(userId, createContactDto);
   }
 
+  @Post('batch')
+  createBatchContacts(
+    @UserId() userId: string,
+    @Body() createContactsDTO: CreateContactDto[],
+  ) {
+    console.log(createContactsDTO, userId, 'this is the array of new contacts');
+    return this.contactsService.createBatchContacts(userId, createContactsDTO);
+  }
+
   @Patch(':id')
   update(
     @Param('id') contactId: string,
