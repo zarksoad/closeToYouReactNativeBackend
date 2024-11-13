@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException, Delete } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Contact } from './entities/contact.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 
@@ -10,6 +10,7 @@ export class ContactsService {
   constructor(
     @InjectRepository(Contact)
     private readonly contactRepository: Repository<Contact>,
+    private readonly dataSource: DataSource,
   ) {}
   async checkContact(email: string): Promise<string> {
     const user = await this.contactRepository.findOne({ where: { email } });
@@ -23,13 +24,28 @@ export class ContactsService {
     userId: string,
     createUserDTO: CreateContactDto,
   ): Promise<Contact> {
-    await this.checkContact(createUserDTO.email);
-    const contact = await this.contactRepository.create({
+    const contact = this.contactRepository.create({
       ...createUserDTO,
       userId,
     });
     const newContact = await this.contactRepository.save(contact);
     return newContact;
+  }
+
+  async createBatchContacts(
+    userId: string,
+    createContactsDTO: CreateContactDto[],
+  ): Promise<Contact[]> {
+    const contacts: Contact[] = [];
+    for (let i = 0; i < createContactsDTO.length; i++) {
+      contacts.push(
+        this.contactRepository.create({
+          ...createContactsDTO[i],
+          userId,
+        }),
+      );
+    }
+    return await this.dataSource.manager.save(contacts);
   }
 
   async verifyContact(contactId: string): Promise<Contact> {
