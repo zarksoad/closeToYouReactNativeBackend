@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Contact } from './entities/contact.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, FindOptionsWhere, Like, Repository } from 'typeorm';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 
@@ -75,7 +75,16 @@ export class ContactsService {
     return await this.contactRepository.remove(contact);
   }
 
-  async findAllContacts(userId: string): Promise<Contact[]> {
-    return await this.contactRepository.find({ where: { userId: userId } });
+  async findAllContacts(
+    userId: string,
+    filterByName: string | null,
+  ): Promise<Contact[]> {
+    const whereCondition: FindOptionsWhere<Contact> = { userId };
+
+    if (filterByName) {
+      whereCondition.name = Like(`%${filterByName}%`);
+    }
+
+    return await this.contactRepository.find({ where: whereCondition });
   }
 }

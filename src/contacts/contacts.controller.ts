@@ -7,6 +7,7 @@ import {
   Delete,
   Get,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ContactsService } from './contacts.service';
 import { CreateContactDto } from './dto/create-contact.dto';
@@ -49,8 +50,12 @@ export class ContactsController {
     return this.contactsService.deleteContact(contactId);
   }
   @Get()
-  findAll(@UserId() userId: string) {
-    return this.contactsService.findAllContacts(userId);
+  findAll(
+    @UserId() userId: string,
+    @Query('filterByName') filterByName: string,
+  ) {
+    console.log('filterByName', filterByName);
+    return this.contactsService.findAllContacts(userId, filterByName);
   }
 
   @Get(':id')
